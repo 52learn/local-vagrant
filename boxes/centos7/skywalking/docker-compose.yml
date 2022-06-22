@@ -62,7 +62,7 @@ services:
       SW_TELEMETRY: prometheus
       TZ: Asia/Shanghai
     volumes:
-      - /vagrant/skywalking/config:/skywalking/config  
+      - /vagrant/skywalking/oap/config:/skywalking/config  
   ui:
     image: apache/skywalking-ui:8.2.0
     container_name: ui
