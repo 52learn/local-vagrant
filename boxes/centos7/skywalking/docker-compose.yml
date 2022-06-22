@@ -60,9 +60,11 @@ services:
       SW_STORAGE_ES_CLUSTER_NODES: elasticsearchskywalking:9200
       SW_HEALTH_CHECKER: default
       SW_TELEMETRY: prometheus
-      TZ: Asia/Shanghai
+      #TZ: Asia/Shanghai
     volumes:
-      - /vagrant/skywalking/oap/config:/skywalking/config  
+      - /vagrant/skywalking/oap/config:/skywalking/config
+      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
+      
   ui:
     image: apache/skywalking-ui:8.2.0
     container_name: ui
@@ -75,4 +77,6 @@ services:
       - 8080:8080
     environment:
       SW_OAP_ADDRESS: oap:12800
-      TZ: Asia/Shanghai      
+      #TZ: Asia/Shanghai
+    volumes:     
+      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime     
