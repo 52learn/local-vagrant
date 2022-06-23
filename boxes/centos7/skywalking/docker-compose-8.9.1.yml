@@ -61,7 +61,9 @@ services:
       SW_HEALTH_CHECKER: default
       SW_TELEMETRY: prometheus
       #设定东八区的城市，防止Oap记录数据时用0时区
-      TZ: Asia/Shanghai
+      #TZ: Asia/Shanghai
+    volumes:
+      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
   ui:
     image: apache/skywalking-ui:8.9.1
     container_name: ui
@@ -74,4 +76,6 @@ services:
       - 8080:8080
     environment:
       SW_OAP_ADDRESS: oap:12800
-      TZ: Asia/Shanghai
+      #TZ: Asia/Shanghai
+    volumes:
+      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
