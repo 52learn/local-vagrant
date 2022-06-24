@@ -16,67 +16,60 @@
 
 version: '3.8'
 services:
-  elasticsearchskywalking:
-    #image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
-    image: elasticsearch:7.9.2
-    container_name: elasticsearchskywalking
-    restart: always
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:${ES_VERSION}
+    container_name: elasticsearch
     ports:
-      - 19200:9200
+      - "9200:9200"
     healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 10s
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - TZ=Asia/Shanghai      
     ulimits:
       memlock:
         soft: -1
         hard: -1
+
   oap:
-    image: apache/skywalking-oap-server:8.2.0-es7
+    image: ${OAP_IMAGE}
     container_name: oap
     depends_on:
-      - elasticsearchskywalking
+      elasticsearch:
+        condition: service_healthy
     links:
-      - elasticsearchskywalking
-    restart: always
+      - elasticsearch
     ports:
-      - 11800:11800
-      - 12800:12800
+      - "11800:11800"
+      - "12800:12800"
     healthcheck:
-      test: ["CMD-SHELL", "/skywalking/bin/swctl ch"]
+      test: [ "CMD-SHELL", "/skywalking/bin/swctl ch" ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 10s
     environment:
-      SW_STORAGE: elasticsearch7
-      SW_STORAGE_ES_CLUSTER_NODES: elasticsearchskywalking:9200
+      SW_STORAGE: elasticsearch
+      SW_STORAGE_ES_CLUSTER_NODES: elasticsearch:9200
       SW_HEALTH_CHECKER: default
       SW_TELEMETRY: prometheus
-      #TZ: Asia/Shanghai
+      JAVA_OPTS: "-Xms2048m -Xmx2048m"
     volumes:
-      - /vagrant/skywalking/oap/config:/skywalking/config
-      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
-      
+      - /vagrant/skywalking/9.1.0/oap/config:/skywalking/config
   ui:
-    image: apache/skywalking-ui:8.2.0
+    image: ${UI_IMAGE}
     container_name: ui
     depends_on:
-      - oap
+      oap:
+        condition: service_healthy
     links:
       - oap
-    restart: always
     ports:
-      - 8080:8080
+      - "8080:8080"
     environment:
-      SW_OAP_ADDRESS: oap:12800
-      #TZ: Asia/Shanghai
-    volumes:     
-      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime     
+      SW_OAP_ADDRESS: http://oap:12800

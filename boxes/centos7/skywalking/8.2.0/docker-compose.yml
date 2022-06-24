@@ -33,13 +33,13 @@ services:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - TZ=Asia/Shanghai
+      - TZ=Asia/Shanghai      
     ulimits:
       memlock:
         soft: -1
         hard: -1
   oap:
-    image: apache/skywalking-oap-server:8.9.1
+    image: apache/skywalking-oap-server:8.2.0-es7
     container_name: oap
     depends_on:
       - elasticsearchskywalking
@@ -56,16 +56,17 @@ services:
       retries: 3
       start_period: 40s
     environment:
-      SW_STORAGE: elasticsearch
+      SW_STORAGE: elasticsearch7
       SW_STORAGE_ES_CLUSTER_NODES: elasticsearchskywalking:9200
       SW_HEALTH_CHECKER: default
       SW_TELEMETRY: prometheus
-      #设定东八区的城市，防止Oap记录数据时用0时区
       #TZ: Asia/Shanghai
     volumes:
+      - /vagrant/skywalking/8.2.0/oap/config:/skywalking/config
       - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
+      
   ui:
-    image: apache/skywalking-ui:8.9.1
+    image: apache/skywalking-ui:8.2.0
     container_name: ui
     depends_on:
       - oap
@@ -75,7 +76,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      SW_OAP_ADDRESS: http://oap:12800
+      SW_OAP_ADDRESS: oap:12800
       #TZ: Asia/Shanghai
-    volumes:
-      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
+    volumes:     
+      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime     
