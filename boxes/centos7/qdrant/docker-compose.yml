@@ -11,5 +11,5 @@ services:
       - 6334
       - 6335
     volumes:
-      - ./qdrant_data:/qdrant/storage
-      - ./production.yaml:/vagrant/qdrant/production.yaml # 挂载本地的配置文件
+      - /vagrant/data/qdrant_data:/qdrant/storage
+      - ./production.yaml:/qdrant/production.yaml
